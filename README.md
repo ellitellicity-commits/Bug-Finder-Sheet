@@ -1,10 +1,16 @@
 # Bug Finder Sheet
 
 <p align="center">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
+  <img src="https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java">
+  <img src="https://img.shields.io/badge/status-actively%20growing-46503C?style=for-the-badge" alt="Status">
+</p>
+
+<p align="center">
   <img src="https://readme-typing-svg.demolab.com/?lines=It's+not+a+bug...;It's+a+feature!;(narrator:+it+was+a+bug);Now+with+15+caught+specimens&font=Fira+Code&size=20&pause=1200&color=46503C&center=true&vCenter=true&width=500&height=50" alt="Typing SVG">
 </p>
 
-A personal field log of bugs found, diagnosed, and fixed while learning Java through [MOOC.fi's Java Programming course](https://java-programming.mooc.fi/), kept as preparation for an Advanced Object-Oriented Programming course.
+A personal field log of bugs found, diagnosed, and fixed while learning Java through...
 
 This isn't a tool or an app. It's a record: fifteen real bugs hit while working through lists, search logic, and loops, each one written down in plain words, with the reasoning behind the fix. The goal is to turn debugging mistakes into a pattern library that gets faster to recognize over time.
 
