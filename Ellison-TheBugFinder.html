@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>A Field Guide to Fifteen Bugs</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EDF3F1;
+    --surface: #FFFFFF;
+    --surface-soft: #F2F7F5;
+    --glass: rgba(255,255,255,0.66);
+    --ink: #232B28;
+    --ink-soft: #5C6763;
+    --ink-faint: #97A29D;
+    --coral: #FF7A66;
+    --coral-deep: #ED5B45;
+    --grape: #8E86F0;
+    --mint: #3FC4A0;
+    --mint-deep: #2BA888;
+    --butter: #FFC861;
+    --ring: rgba(35,43,40,0.08);
+    --shadow: 0 22px 48px -20px rgba(35,43,40,0.22), 0 6px 16px -8px rgba(35,43,40,0.10);
+    --shadow-sm: 0 10px 24px -12px rgba(35,43,40,0.18);
+    /* liquid */
+    --liq-mint: #8FE3CB;
+    --liq-coral: #FFB3A4;
+    --liq-grape: #C2BDF7;
+    --liq-butter: #FFDD93;
+    /* illustration */
+    --skin: #DBA67F; --skin-sh: #C58E66;
+    --shirt: #45B79A; --shirt-sh: #2FA888;
+    --plate-bg: #E7F4EE; --plate-ring: #D6EBE2;
+    --line: #2A322F;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ---- living metaball liquid ---- */
+  .goo { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; opacity: 0.62; }
+  .goo-field { position: absolute; inset: -14%; background: var(--bg); filter: contrast(20); }
+  .blob {
+    position: absolute; border-radius: 50%; filter: blur(28px);
+    will-change: transform; transform: translateZ(0);
+  }
+  .blob.b1 { width: 360px; height: 360px; left: 6%;  top: 10%; background: var(--liq-mint); }
+  .blob.b2 { width: 300px; height: 300px; left: 16%; top: 30%; background: var(--liq-coral); }
+  .blob.b3 { width: 340px; height: 340px; left: 60%; top: 6%;  background: var(--liq-grape); }
+  .blob.b4 { width: 280px; height: 280px; left: 74%; top: 28%; background: var(--liq-mint); }
+  .blob.b5 { width: 320px; height: 320px; left: 38%; top: 58%; background: var(--liq-butter); }
+  .blob.b6 { width: 260px; height: 260px; left: 80%; top: 64%; background: var(--liq-coral); }
+
+  .shell { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 44px); position: relative; z-index: 1; }
+
+  /* ---- top bar ---- */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 26px 0 0; gap: 16px; flex-wrap: wrap; }
+  .wordmark { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: clamp(15px, 2.4vw, 18px); color: var(--ink); letter-spacing: -0.01em; }
+  .wordmark .dot { color: var(--coral); }
+  .meter-pill {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--glass); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.7); border-radius: 999px;
+    padding: 9px 16px; box-shadow: var(--shadow-sm);
+    font-weight: 700; font-size: clamp(10px, 1.5vw, 11.5px); letter-spacing: 0.06em; color: var(--ink-soft);
+  }
+  .meter-pill .ct-line { width: 70px; height: 6px; background: var(--surface-soft); border-radius: 999px; overflow: hidden; }
+  .meter-pill .ct-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--mint), var(--mint-deep)); border-radius: 999px; transition: width 0.7s cubic-bezier(.2,.8,.2,1); }
+
+  /* ---- HERO ---- */
+  .hero { display: grid; grid-template-columns: 1.05fr 0.95fr; align-items: center; gap: clamp(24px, 4vw, 52px); min-height: calc(100vh - 80px); padding: 36px 0 64px; position: relative; }
+
+  .hero-text {
+    position: relative; z-index: 2;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(20px) saturate(1.25); backdrop-filter: blur(20px) saturate(1.25);
+    border: 1px solid rgba(255,255,255,0.7); border-radius: 34px;
+    padding: clamp(26px, 4vw, 46px); box-shadow: var(--shadow);
+  }
+
+  .hero-eyebrow {
+    display: inline-block;
+    font-weight: 700; font-size: clamp(10px, 1.5vw, 11.5px); letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--coral-deep); background: rgba(255,122,102,0.12);
+    padding: 7px 14px; border-radius: 999px; margin-bottom: 24px;
+    opacity: 0; transform: translateY(12px); animation: rise 0.9s 0.15s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+
+  .hero h1 {
+    font-family: 'Baloo 2', sans-serif; font-weight: 800;
+    font-size: clamp(2.6rem, 6.4vw, 5.4rem); line-height: 1.0; letter-spacing: -0.015em; margin: 0; max-width: 13ch;
+  }
+  .hero h1 .line { display: block; overflow: hidden; }
+  .hero h1 .line > span { display: block; opacity: 0; transform: translateY(100%); animation: rise 1.1s cubic-bezier(.2,.8,.2,1) forwards; }
+  .hero h1 .line:nth-child(1) > span { animation-delay: 0.26s; }
+  .hero h1 .line:nth-child(2) > span { animation-delay: 0.38s; }
+  .hero h1 .line:nth-child(3) > span { animation-delay: 0.50s; }
+  .hero h1 em { font-style: normal; color: var(--coral); }
+
+  .hero-hook {
+    font-family: 'Baloo 2', sans-serif; font-weight: 600;
+    font-size: clamp(1.35rem, 2.7vw, 2.05rem); line-height: 1.28; color: var(--ink);
+    max-width: 24ch; margin: clamp(24px, 3.5vw, 34px) 0 0;
+    opacity: 0; transform: translateY(12px); animation: rise 0.95s 0.8s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  .hero-hook .accent { color: var(--mint-deep); }
+
+  .hero-sub {
+    margin: 20px 0 0; max-width: 44ch; font-size: clamp(0.95rem, 1.6vw, 1.02rem); line-height: 1.65; color: var(--ink-soft); font-weight: 500;
+    opacity: 0; transform: translateY(12px); animation: rise 0.95s 0.95s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+
+  /* taxonomy chips */
+  .taxonomy { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px; opacity: 0; animation: fade 1s 1.15s ease forwards; }
+  .chip {
+    display: inline-flex; align-items: baseline; gap: 7px;
+    background: var(--surface-soft); border: 1px solid var(--ring); border-radius: 999px;
+    padding: 8px 15px; font-size: clamp(11px, 1.5vw, 12.5px); font-weight: 600; color: var(--ink);
+    box-shadow: var(--shadow-sm);
+  }
+  .chip .k { font-size: 0.82em; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+  .chip.is-genus .v { font-style: italic; color: var(--mint-deep); font-weight: 700; }
+
+  /* ---- HERO ART ---- */
+  .hero-art { position: relative; display: flex; justify-content: center; z-index: 1; }
+  .plate { margin: 0; position: relative; width: 100%; max-width: 430px; will-change: transform; transform: translateZ(0); }
+  .plate svg { width: 100%; height: auto; display: block; overflow: visible; filter: drop-shadow(0 20px 36px rgba(35,43,40,0.18)); }
+  .plate figcaption { margin-top: 16px; text-align: center; font-weight: 700; font-size: clamp(9px, 1.4vw, 10.5px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+  .plate figcaption b { color: var(--coral); }
+
+  .scroll-cue { position: absolute; left: 0; bottom: 20px; font-weight: 700; font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); display: flex; align-items: center; gap: 12px; opacity: 0; animation: fade 1.1s 1.4s ease forwards; }
+  .scroll-cue::before { content: ""; width: 40px; height: 2px; border-radius: 2px; background: var(--ink-faint); display: inline-block; transform-origin: left; animation: cueline 2.6s ease-in-out infinite; }
+
+  /* illustration idle anims */
+  .il-figure { transform-box: view-box; transform-origin: 50% 100%; animation: breathe 6.5s ease-in-out infinite; }
+  .il-eye { transform-box: fill-box; transform-origin: center; animation: blink 5.2s infinite; }
+  .il-pupil { will-change: transform; }
+  .il-head { transform-box: fill-box; transform-origin: 50% 96%; }
+  .il-bug { transform-box: fill-box; transform-origin: center; animation: bugbob 4s ease-in-out infinite; }
+  .il-glint { transform-box: fill-box; transform-origin: center; animation: glint 3.6s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  @keyframes blink { 0%,91%,100% { transform: scaleY(1); } 95% { transform: scaleY(0.12); } }
+  @keyframes bugbob { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-5px) rotate(4deg); } }
+  @keyframes glint { 0%,100% { opacity: 0.12; } 50% { opacity: 0.5; } }
+
+  /* ---- collection header ---- */
+  .collection-head { display: flex; align-items: center; gap: 16px; margin: 36px 0 24px; }
+  .collection-head .ch-no { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; color: var(--coral); background: rgba(255,122,102,0.12); border-radius: 999px; padding: 4px 12px; }
+  .collection-head .ch-title { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: clamp(1.5rem, 3vw, 2rem); color: var(--ink); }
+  .collection-head .ch-rule { flex: 1; height: 2px; border-radius: 2px; background: var(--ring); }
+  .collection-head .ch-count { font-weight: 700; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+
+  /* ---- specimen cards ---- */
+  .collection { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; padding-bottom: 50px; }
+  .specimen {
+    position: relative; background: var(--surface); border-radius: 30px;
+    padding: clamp(26px, 3.6vw, 44px); box-shadow: var(--shadow); overflow: hidden;
+    opacity: 0; transform: translateY(34px) scale(0.985);
+    transition: opacity 0.9s cubic-bezier(.2,.8,.2,1), transform 0.9s cubic-bezier(.2,.8,.2,1);
+  }
+  .specimen.seen { opacity: 1; transform: none; }
+
+  /* big numeral lives in the RIGHT margin only — never behind the text column */
+  .spec-no {
+    position: absolute; right: clamp(-6px, 0vw, 18px); top: 50%; transform: translateY(-50%);
+    font-family: 'Baloo 2', sans-serif; font-weight: 800;
+    font-size: clamp(6rem, 16vw, 13rem); line-height: 0.8;
+    color: var(--mint); opacity: 0.1; mix-blend-mode: multiply;
+    pointer-events: none; user-select: none; -webkit-user-select: none; z-index: 0;
+  }
+  .spec-inner { position: relative; z-index: 2; max-width: 80%; }
+
+  .spec-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .spec-pill { font-weight: 700; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; background: var(--surface-soft); color: var(--ink-soft); }
+  .spec-pill.is-no { background: rgba(255,122,102,0.13); color: var(--coral-deep); }
+  .spec-pill.is-roman { background: rgba(142,134,240,0.13); color: var(--grape); }
+
+  .spec-binomial { font-style: italic; font-weight: 600; font-size: clamp(1.05rem, 2.1vw, 1.3rem); color: var(--mint-deep); margin-bottom: 6px; }
+  .spec-common { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: clamp(1.5rem, 3.4vw, 2.4rem); line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); margin-bottom: 26px; }
+
+  .field { display: grid; grid-template-columns: 124px 1fr; gap: 10px 22px; align-items: start; }
+  .field-label { font-weight: 700; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); padding-top: 5px; }
+  .field-body { font-size: clamp(0.98rem, 1.6vw, 1.04rem); line-height: 1.72; color: var(--ink); font-weight: 500; }
+
+  .field-quote {
+    grid-column: 1 / -1; margin: 8px 0; padding: 18px 22px; border-radius: 20px;
+    background: var(--surface-soft);
+    font-family: 'Baloo 2', sans-serif; font-weight: 600; font-size: clamp(1.15rem, 2.4vw, 1.42rem); line-height: 1.4; color: var(--ink); position: relative;
+  }
+  .field-quote .qmark { color: var(--coral); font-weight: 700; }
+
+  code { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.84em; background: var(--surface-soft); padding: 2px 7px; border-radius: 7px; color: var(--coral-deep); font-weight: 500; }
+
+  /* catalogue pill + squash */
+  .spec-action { margin-top: 30px; display: flex; align-items: center; gap: 16px; min-height: 44px; flex-wrap: wrap; }
+  .catalogue-btn {
+    appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 12px;
+    background: var(--surface-soft); border: 1px solid var(--ring); border-radius: 999px;
+    padding: 11px 20px 11px 16px; font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--ink-soft);
+    transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  }
+  .catalogue-btn:hover { color: var(--coral-deep); background: rgba(255,122,102,0.1); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+  .catalogue-btn:focus-visible { outline: 2px solid var(--coral); outline-offset: 3px; }
+  .bug-glyph { width: 24px; height: 24px; display: block; transform-origin: 50% 70%; }
+  .bug-glyph .body { fill: var(--coral); transition: fill 0.4s ease; }
+  .bug-glyph .leg { stroke: var(--ink); stroke-width: 1.3; stroke-linecap: round; }
+  .bug-glyph .spot { fill: var(--ink); opacity: 0.8; }
+  .splat { position: absolute; width: 36px; height: 36px; left: -1px; top: -1px; pointer-events: none; opacity: 0; }
+  .splat circle { fill: var(--coral); }
+
+  @keyframes squashIt { 0% { transform: scaleY(1) scaleX(1) translateY(0); } 28% { transform: scaleY(1.18) scaleX(0.86) translateY(-4px); } 52% { transform: scaleY(0.22) scaleX(1.5) translateY(7px); } 72% { transform: scaleY(0.3) scaleX(1.42) translateY(7px); } 100% { transform: scaleY(0.26) scaleX(1.45) translateY(7px); } }
+  .bug-glyph.squashing { animation: squashIt 0.5s cubic-bezier(.3,1.4,.5,1) forwards; }
+  @keyframes splatOut { 0% { opacity: 0; transform: scale(0.3); } 40% { opacity: 0.55; transform: scale(1.05); } 100% { opacity: 0; transform: scale(1.35); } }
+  .splat.go { animation: splatOut 0.6s ease-out forwards; }
+
+  .stamp { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; background: linear-gradient(90deg, var(--mint), var(--mint-deep)); padding: 9px 16px; border-radius: 999px; transform: scale(0.6); opacity: 0; transition: opacity 0.4s ease, transform 0.45s cubic-bezier(.2,1.7,.5,1); white-space: nowrap; box-shadow: var(--shadow-sm); }
+  .specimen.catalogued .stamp { opacity: 1; transform: scale(1); }
+  .specimen.catalogued .catalogue-btn { opacity: 0; pointer-events: none; position: absolute; transition: opacity 0.25s ease; }
+  .specimen.catalogued .bug-glyph .body { fill: var(--mint-deep); }
+
+  .colophon { margin: 36px auto 110px; max-width: 880px; background: var(--glass); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.7); border-radius: 28px; box-shadow: var(--shadow); padding: clamp(24px, 3.5vw, 40px); display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .colophon .col-quote { font-family: 'Baloo 2', sans-serif; font-weight: 600; font-size: clamp(1.25rem, 2.6vw, 1.6rem); line-height: 1.32; color: var(--ink); max-width: 26ch; }
+  .colophon .col-meta { font-weight: 700; font-size: 11px; letter-spacing: 0.08em; color: var(--ink-faint); text-transform: uppercase; line-height: 1.9; text-align: right; }
+
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  @keyframes fade { to { opacity: 1; } }
+  @keyframes cueline { 0%,100% { transform: scaleX(0.4); opacity: 0.4; } 50% { transform: scaleX(1); opacity: 1; } }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 18px; min-height: 0; padding: 22px 0 50px; }
+    .hero-art { order: -1; max-width: 320px; margin: 0 auto; }
+    .scroll-cue { position: static; margin-top: 24px; }
+  }
+  @media (max-width: 640px) {
+    .spec-inner { max-width: 100%; }
+    .spec-no { font-size: clamp(4.5rem, 22vw, 7rem); top: 22px; right: 6px; transform: none; opacity: 0.07; }
+    .field { grid-template-columns: 1fr; gap: 3px; }
+    .field-label { padding-top: 14px; }
+    .colophon { flex-direction: column; align-items: flex-start; }
+    .colophon .col-meta { text-align: left; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.001s !important; transition-duration: 0.001s !important; }
+    .specimen { opacity: 1; transform: none; }
+    [class^="hero-"], .hero h1 .line > span, .taxonomy, .scroll-cue { opacity: 1; transform: none; }
+    .goo { opacity: 0.45; }
+  }
+</style>
+</head>
+<body>
+
+<div class="goo" aria-hidden="true">
+  <div class="goo-field">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+    <span class="blob b4"></span><span class="blob b5"></span><span class="blob b6"></span>
+  </div>
+</div>
+
+<div class="shell">
+
+  <div class="topbar">
+    <span class="wordmark">A Field Guide<span class="dot">.</span></span>
+    <div class="meter-pill">
+      <span id="meterCount">00 / 15</span>
+      <div class="ct-line"><div class="ct-fill" id="meterFill"></div></div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text">
+      <span class="hero-eyebrow">Vol. 01 &middot; Debugging in the Field</span>
+      <h1>
+        <span class="line"><span>Fifteen Bugs,</span></span>
+        <span class="line"><span>Found in the</span></span>
+        <span class="line"><span>Wild <em>&amp; Named.</em></span></span>
+      </h1>
+      <p class="hero-hook">Every bug, found and named, is one you'll <span class="accent">never fear again.</span></p>
+      <p class="hero-sub">A season of debugging, kept as field notes. Fifteen specimens caught in the study of Java, lists, and the quiet art of search.</p>
+
+      <div class="taxonomy">
+        <span class="chip is-genus"><span class="k">Genus</span><span class="v">Java</span></span>
+        <span class="chip"><span class="k">Order</span><span class="v">Lists &amp; Search</span></span>
+        <span class="chip"><span class="k">Collector</span><span class="v">Ellison</span></span>
+        <span class="chip"><span class="k">Dated</span><span class="v">June 2026</span></span>
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <figure class="plate" id="plate">
+        <svg viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A developer examining a bug specimen through a magnifying glass">
+          <defs>
+            <clipPath id="plateClip"><circle cx="220" cy="210" r="196"/></clipPath>
+            <radialGradient id="plateVig" cx="50%" cy="40%" r="64%">
+              <stop offset="0%" stop-color="#EEF8F3"/>
+              <stop offset="100%" stop-color="#DCEFE7"/>
+            </radialGradient>
+          </defs>
+
+          <circle cx="220" cy="210" r="198" fill="none" stroke="var(--plate-ring)" stroke-width="2"/>
+          <circle cx="220" cy="210" r="190" fill="url(#plateVig)"/>
+
+          <g clip-path="url(#plateClip)">
+            <g class="il-figure">
+              <path d="M104 412 C104 312 150 276 220 276 C290 276 336 312 336 412 Z" fill="var(--shirt)"/>
+              <path d="M220 276 C290 276 336 312 336 412 L286 412 C286 330 258 292 220 290 Z" fill="var(--shirt-sh)" opacity="0.5"/>
+              <path d="M198 286 L220 312 L242 286 L236 280 L220 300 L204 280 Z" fill="#F4FBF8" opacity="0.9"/>
+              <line x1="220" y1="312" x2="220" y2="412" stroke="#EAF6F1" stroke-width="2.4" opacity="0.7"/>
+
+              <path d="M204 250 L236 250 L236 282 C236 292 204 292 204 282 Z" fill="var(--skin)"/>
+              <path d="M204 268 C214 280 226 280 236 268 L236 250 L204 250 Z" fill="var(--skin-sh)" opacity="0.4"/>
+
+              <path d="M312 320 C336 332 340 372 326 404 L300 396 C312 366 306 344 296 332 Z" fill="var(--shirt)"/>
+              <path d="M300 392 C292 388 286 380 286 372 C286 364 300 360 308 366 C316 372 312 396 300 392 Z" fill="var(--skin)"/>
+              <rect x="262" y="372" width="40" height="6" rx="3" transform="rotate(-12 282 375)" fill="var(--coral)"/>
+              <rect x="252" y="374" width="14" height="5" rx="2.5" transform="rotate(-12 259 376)" fill="var(--line)"/>
+
+              <g class="il-head">
+                <ellipse cx="220" cy="196" rx="52" ry="56" fill="var(--skin)"/>
+                <path d="M220 140 C250 140 272 164 272 196 C272 214 264 230 252 240 C268 232 280 214 280 192 C280 156 254 132 220 132 Z" fill="var(--skin-sh)" opacity="0.35"/>
+                <ellipse cx="270" cy="200" rx="9" ry="13" fill="var(--skin)"/>
+                <ellipse cx="270" cy="200" rx="4" ry="7" fill="var(--skin-sh)" opacity="0.5"/>
+                <path d="M168 188 C162 138 210 116 244 128 C276 138 280 168 276 190 C274 176 268 160 250 154 C254 166 252 178 246 184 C242 168 230 156 210 156 C190 156 176 170 174 190 C172 200 170 200 168 188 Z" fill="var(--line)"/>
+                <path d="M172 192 C170 168 186 152 210 152 C200 160 196 172 198 184 C190 178 180 182 176 194 C174 200 173 200 172 192 Z" fill="var(--line)"/>
+                <path d="M196 180 C200 176 210 176 214 180" fill="none" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M228 180 C232 176 242 176 246 180" fill="none" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+                <g class="il-eye"><ellipse cx="205" cy="194" rx="6.4" ry="6.8" fill="#FFFFFF"/><circle class="il-pupil" cx="205" cy="194" r="3.5" fill="var(--line)"/></g>
+                <g class="il-eye"><ellipse cx="237" cy="194" rx="6.4" ry="6.8" fill="#FFFFFF"/><circle class="il-pupil" cx="237" cy="194" r="3.5" fill="var(--line)"/></g>
+                <path d="M216 200 C214 208 214 212 220 214" fill="none" stroke="var(--skin-sh)" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+                <path d="M206 224 C214 232 230 232 238 224" fill="none" stroke="var(--coral-deep)" stroke-width="3" stroke-linecap="round"/>
+              </g>
+
+              <path d="M128 318 C108 296 110 250 134 224 L160 244 C142 264 142 290 152 308 Z" fill="var(--shirt)"/>
+              <path d="M134 232 C150 212 172 196 188 186 L200 204 C184 214 166 230 154 248 Z" fill="var(--skin)"/>
+              <ellipse cx="196" cy="190" rx="13" ry="11" fill="var(--skin)" transform="rotate(-30 196 190)"/>
+              <line x1="186" y1="176" x2="160" y2="150" stroke="var(--line)" stroke-width="9" stroke-linecap="round"/>
+              <line x1="186" y1="176" x2="166" y2="156" stroke="var(--coral)" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="150" cy="138" r="40" fill="#FFFFFF" fill-opacity="0.55"/>
+              <circle cx="150" cy="138" r="40" fill="none" stroke="var(--line)" stroke-width="7"/>
+              <circle cx="150" cy="138" r="40" fill="none" stroke="var(--mint)" stroke-width="2.5" opacity="0.7"/>
+              <path class="il-glint" d="M128 120 C134 112 146 108 156 110" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.3"/>
+
+              <g class="il-bug" transform="translate(150 138)">
+                <line x1="-9" y1="-4" x2="-17" y2="-12" stroke="var(--line)" stroke-width="2" stroke-linecap="round"/>
+                <line x1="-10" y1="2" x2="-19" y2="2" stroke="var(--line)" stroke-width="2" stroke-linecap="round"/>
+                <line x1="-9" y1="8" x2="-16" y2="16" stroke="var(--line)" stroke-width="2" stroke-linecap="round"/>
+                <line x1="9" y1="-4" x2="17" y2="-12" stroke="var(--line)" stroke-width="2" stroke-linecap="round"/>
+                <line x1="10" y1="2" x2="19" y2="2" stroke="var(--line)" stroke-width="2" stroke-linecap="round"/>
+                <line x1="9" y1="8" x2="16" y2="16" stroke="var(--line)" stroke-width="2" stroke-linecap="round"/>
+                <ellipse cx="0" cy="2" rx="11" ry="14" fill="var(--coral)"/>
+                <line x1="0" y1="-11" x2="0" y2="15" stroke="var(--line)" stroke-width="1.6"/>
+                <circle cx="-4" cy="-2" r="1.8" fill="var(--line)"/>
+                <circle cx="4" cy="-2" r="1.8" fill="var(--line)"/>
+                <circle cx="-4" cy="6" r="1.6" fill="var(--line)"/>
+                <circle cx="4" cy="6" r="1.6" fill="var(--line)"/>
+                <circle cx="0" cy="-13" r="4.5" fill="var(--coral)"/>
+                <line x1="-2" y1="-17" x2="-5" y2="-22" stroke="var(--line)" stroke-width="1.6" stroke-linecap="round"/>
+                <line x1="2" y1="-17" x2="5" y2="-22" stroke="var(--line)" stroke-width="1.6" stroke-linecap="round"/>
+              </g>
+            </g>
+          </g>
+        </svg>
+        <figcaption>Pl. I &middot; <b>The Collector</b> at Work</figcaption>
+      </figure>
+    </div>
+
+    <div class="scroll-cue">Begin the collection</div>
+  </section>
+
+  <div class="collection-head">
+    <span class="ch-no">02</span>
+    <span class="ch-title">The Collection</span>
+    <span class="ch-rule"></span>
+    <span class="ch-count">Specimens i&ndash;xv</span>
+  </div>
+
+  <main class="collection" id="collection"></main>
+
+  <div class="colophon">
+    <div class="col-quote">The collection stays open. New specimens always welcome.</div>
+    <div class="col-meta">End of guide<br>Fifteen specimens<br>All in their own words</div>
+  </div>
+
+</div>
+
+<script>
+const specimens = [
+  { binomial: "Indexus prematurus", common: "The Index That Counted Too Soon",
+    found: "Used print debugging. Added a print statement showing the list size right before the <code>.get()</code> call, just to see what was actually happening.",
+    quote: "My index formula was before the loop, meaning the size it was calculating was always 0, (0 - 1 = -1 | Not possible), that is why I saw a -1 OutOfBounds error.",
+    lesson: "So basically, where a line sits matters just as much as what it says. The formula itself was fine, it just ran before the list had anything in it, so it was always doing math on an empty list." },
+  { binomial: "Machina redundans", common: "The Counter Nobody Needed",
+    found: "Was building a manual counter to track the last element, but it felt like a lot of overprocessing for something that should be simple.",
+    quote: "I think it was a lot of overprocessing and I could kind of see how it could work, but that was where I was mostly stuck at.",
+    lesson: "If something feels heavier than it should, that feeling is usually right. The list already knows its own size, so there's no need to build a second thing that tracks the same info." },
+  { binomial: "Inversus directio", common: "get() Run Backwards",
+    found: "Searched for the value 1 in the list (1, 2, 3) and the output said \u201c1 is at index 2\u201d, which made no sense at first.",
+    quote: "So .get() is only for position to value, but I'm trying to do value to position?",
+    lesson: "<code>list.get(index)</code> goes one direction only: give it a spot, it gives you what's there. It can't work backwards and tell you where a value lives. Needed a totally different approach for that." },
+  { binomial: "Iteratio superflua", common: "A Loop Around a Finished Job",
+    found: "Wrapped <code>list.indexOf(number)</code> in a for loop, and it printed the exact same result over and over, once for every element in the list.",
+    quote: "indexOf() already performs the entire search internally in one call, so the surrounding loop was just re-printing the same finished answer on every pass.",
+    lesson: "Before wrapping anything in a loop, check if the method already does the whole job by itself. indexOf() finishes the search the second you call it, no loop needed." },
+  { binomial: "Singularis inventor", common: "The Search That Stopped at One",
+    found: "List was (7, 2, 8, 8, 11), searched for 8, and indexOf() only ever gave back index 2. It never found the second 8 at index 3.",
+    quote: "Decided to build a manual loop instead. Walk every slot with list.get(i), compare it to the target value, and print i whenever there's a match, since indexOf() stops at the first hit.",
+    lesson: "indexOf() only ever gives you the first match it finds. If you need every single occurrence, you have to build the loop yourself and check each slot one by one." },
+  { binomial: "Terminator abruptus", common: "The break That Gave Up Early",
+    found: "Had a search loop checking <code>.equals()</code>, but the else branch had a break in it, so it quit the moment the first slot didn't match.",
+    quote: "I get why else break isn't needed either. If it finds a number on the list that isn't in the range and the numbers after that number do, then it misses an entire section of numbers that match the description.",
+    lesson: "A break inside an else basically gives up after one wrong guess, even though tons of correct answers might still be sitting later in the list. The else should just do nothing and let the loop keep going." },
+  { binomial: "Aequalitas falsa", common: "== Where .equals() Belonged",
+    found: "Used <code>list.get(i) == names</code> to compare two strings, and it kept failing even when the text was clearly the same.",
+    quote: "== is not for strings, .equals() is!",
+    lesson: "== checks if two things are literally the same object sitting in memory, not whether they look the same. For strings you need .equals(), which actually checks the text. Ints are fine with ==, strings aren't." },
+  { binomial: "Officium duplex", common: "One Variable, Two Jobs",
+    found: "Was using the same variable, <code>names</code>, to hold the search term and then later overwriting it inside the loop to hold the result. That destroyed the original search term halfway through.",
+    quote: "Two separate jobs (holding the search term vs. holding the evolving answer) needed two separate variables, not one being reused mid-loop.",
+    lesson: "One variable, one job. The moment you make it do two things at once, it loses the first thing the second you update it for the second thing." },
+  { binomial: "Memoria deleta", common: "The Answer That Erased Itself",
+    found: "The answer correctly flipped to \u201cfound\u201d on a match, but then the else branch reset it right back to \u201cnot found\u201d on the very next slot that didn't match.",
+    quote: "Removed the else branch entirely, leaving only the if to ever change the answer variable, so a correct found could never get overwritten by a later miss.",
+    lesson: "Once something is found, nothing later in the loop should be allowed to undo that. Only the matching condition should ever update the answer." },
+  { binomial: "Echo repetens", common: "The Print Trapped in the Loop",
+    found: "Output kept printing \u201cnot found, not found, found\u201d over and over, instead of one clean answer at the end.",
+    quote: "OH CRAP IT IS, I thought it was outside, lol.",
+    lesson: "Indentation can trick you into thinking something is outside a loop when the actual braces say otherwise. If something prints way more times than expected, go check exactly where the closing brace really is." },
+  { binomial: "Comparatio inversa", common: "A Range Turned Inside Out",
+    found: "Wrote the condition as <code>number &lt;= lowerLimit &amp;&amp; number &gt;= upperLimit</code>, which can't ever be true for a normal range like [0, 5].",
+    quote: "It should be the opposite way around.",
+    lesson: "To check if a number is inside a range, it needs to be greater than or equal to the lower limit AND less than or equal to the upper limit. Flip either side and the whole check breaks." },
+  { binomial: "Recursio infinita", common: "The Method That Called Forever",
+    found: "The method <code>printNumbersInRange</code> called itself again at the very end, with the exact same arguments every time. That's a guaranteed crash.",
+    quote: "That printNumbersInRange is just excessive code, it is already called within our parameters, calling it again will cause it to endlessly loop.",
+    lesson: "Calling yourself only makes sense if something actually changes each time, so you're working toward a stopping point. Same arguments every time means there's no way out." },
+  { binomial: "Lectio singularis", common: "The Input Read Only Once",
+    found: "Only one number ever got read in, because the Scanner line was just sitting there by itself with no loop wrapped around it.",
+    quote: "Reused the existing -1 terminated while loop pattern to keep reading and adding values until the stop signal was typed.",
+    lesson: "A single scanner.nextLine() only ever reads once. To keep collecting values you need a loop wrapped around the read, with something telling it when to stop." },
+  { binomial: "Textus permixtus", common: "A Sentence Mistaken for a Number",
+    found: "Wrote <code>Integer.valueOf</code> with the prompt text and the scanner read mashed together inside the same parentheses, trying to parse a whole sentence as a number.",
+    quote: "The prompt needed to be printed as its own statement, separate from the line doing the actual parsing.",
+    lesson: "Print the prompt first, on its own line. Then read the input on the next line. Mixing them together means you're trying to convert a sentence into a number, which obviously breaks." },
+  { binomial: "Nomen alienum", common: "Calling With Names That Weren't There",
+    found: "<code>main()</code> called <code>printNumbersInRange(numbers, lowerLimit, upperLimit)</code>, but main never actually had variables with those names. Those were just the method's own internal parameter names.",
+    quote: "A method's parameter names belong to its own internal scope, and the caller has to pass in whatever variables it actually has.",
+    lesson: "Parameter names only exist inside that method. Whoever's calling the method needs to use their own actual variables, even if those variables are named something completely different." }
+];
+
+const roman = ["i","ii","iii","iv","v","vi","vii","viii","ix","x","xi","xii","xiii","xiv","xv"];
+const bugSVG = `<svg class="bug-glyph" viewBox="0 0 24 24" aria-hidden="true"><g class="legs"><line class="leg" x1="6" y1="10" x2="2" y2="7"/><line class="leg" x1="6" y1="13" x2="2" y2="13"/><line class="leg" x1="6" y1="16" x2="3" y2="19"/><line class="leg" x1="18" y1="10" x2="22" y2="7"/><line class="leg" x1="18" y1="13" x2="22" y2="13"/><line class="leg" x1="18" y1="16" x2="21" y2="19"/></g><ellipse class="body" cx="12" cy="13" rx="6" ry="7.5"/><line class="leg" x1="12" y1="6" x2="12" y2="20"/><circle class="spot" cx="9.4" cy="11" r="1.1"/><circle class="spot" cx="14.6" cy="11" r="1.1"/><circle class="spot" cx="9.6" cy="15" r="1"/><circle class="spot" cx="14.4" cy="15" r="1"/><circle class="body" cx="12" cy="5" r="2.4"/></svg>`;
+const splatSVG = `<svg class="splat" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="14" r="3"/><circle cx="6" cy="11" r="1.4"/><circle cx="18" cy="12" r="1.6"/><circle cx="8" cy="18" r="1.2"/><circle cx="17" cy="18" r="1"/><circle cx="12" cy="6" r="1.2"/></svg>`;
+
+const col = document.getElementById('collection');
+specimens.forEach((s, i) => {
+  const n = String(i + 1).padStart(2, '0');
+  const el = document.createElement('article');
+  el.className = 'specimen';
+  el.innerHTML = `
+    <div class="spec-no">${n}</div>
+    <div class="spec-inner">
+      <div class="spec-pills">
+        <span class="spec-pill is-no">Specimen No. ${n}</span>
+        <span class="spec-pill is-roman">${roman[i]}</span>
+      </div>
+      <div class="spec-binomial">${s.binomial}</div>
+      <div class="spec-common">${s.common}</div>
+      <div class="field">
+        <div class="field-label">Field Observation</div>
+        <div class="field-body">${s.found}</div>
+        <div class="field-quote"><span class="qmark">&ldquo;</span>${s.quote}<span class="qmark">&rdquo;</span></div>
+        <div class="field-label">The Lesson</div>
+        <div class="field-body">${s.lesson}</div>
+      </div>
+      <div class="spec-action">
+        <button class="catalogue-btn" type="button" aria-label="Catalogue this specimen">
+          <span style="position:relative;display:inline-block;">${bugSVG}${splatSVG}</span>
+          <span class="btn-text">Catalogue specimen</span>
+        </button>
+        <span class="stamp">&#10003; Catalogued</span>
+      </div>
+    </div>`;
+  col.appendChild(el);
+
+  const btn = el.querySelector('.catalogue-btn');
+  const glyph = el.querySelector('.bug-glyph');
+  const splat = el.querySelector('.splat');
+  btn.addEventListener('click', () => {
+    if (el.classList.contains('catalogued')) return;
+    glyph.classList.add('squashing');
+    splat.classList.add('go');
+    setTimeout(() => { el.classList.add('catalogued'); updateMeter(); }, 330);
+  });
+});
+
+function updateMeter() {
+  const total = specimens.length;
+  const done = document.querySelectorAll('.specimen.catalogued').length;
+  document.getElementById('meterFill').style.width = (done / total * 100) + '%';
+  document.getElementById('meterCount').textContent = String(done).padStart(2, '0') + ' / ' + total;
+}
+
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('seen'); io.unobserve(e.target); } });
+}, { threshold: 0.14 });
+document.querySelectorAll('.specimen').forEach(s => io.observe(s));
+
+/* ---------- living physics: lerped cursor follow + drifting metaball liquid ---------- */
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const lerp = (a, b, t) => a + (b - a) * t;
+const LERP = 0.06;
+
+const plate = document.getElementById('plate');
+const pupils = Array.from(document.querySelectorAll('.il-pupil'));
+const head = document.querySelector('.il-head');
+
+let tx = 0, ty = 0, cxv = 0, cyv = 0;
+window.addEventListener('mousemove', (e) => {
+  tx = (e.clientX / window.innerWidth) * 2 - 1;
+  ty = (e.clientY / window.innerHeight) * 2 - 1;
+}, { passive: true });
+window.addEventListener('mouseleave', () => { tx = 0; ty = 0; });
+
+const blobEls = Array.from(document.querySelectorAll('.blob'));
+const blobs = blobEls.map(el => ({ el, x: 0, y: 0, tx: 0, ty: 0 }));
+function retarget() { blobs.forEach(b => { b.tx = (Math.random()*2-1)*130; b.ty = (Math.random()*2-1)*130; }); }
+retarget();
+if (!reduce) setInterval(retarget, 3600);
+
+let scrollY = 0;
+window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+
+function frame() {
+  cxv = lerp(cxv, tx, LERP);
+  cyv = lerp(cyv, ty, LERP);
+  const px = cxv * 2.6, py = cyv * 2.4;
+  pupils.forEach(p => { p.style.transform = `translate(${px}px, ${py}px)`; });
+  if (head) head.style.transform = `translate(${cxv*3}px, ${cyv*2}px) rotate(${cxv*2.3}deg)`;
+  const sy = Math.min(scrollY * 0.05, 40);
+  if (plate) plate.style.transform = `translate(${cxv*6}px, ${sy + cyv*5}px)`;
+  blobs.forEach(b => {
+    b.x = lerp(b.x, b.tx, 0.05);
+    b.y = lerp(b.y, b.ty, 0.05);
+    b.el.style.transform = `translate(${b.x}px, ${b.y}px) translateZ(0)`;
+  });
+  requestAnimationFrame(frame);
+}
+if (!reduce) requestAnimationFrame(frame);
+else blobs.forEach(b => { b.el.style.transform = 'translateZ(0)'; });
+</script>
+
+</body>
+</html>
