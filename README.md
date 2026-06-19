@@ -22,7 +22,7 @@ Each entry in the log follows the same structure:
 - **My own words**, the actual reasoning written down in the moment, not cleaned up after the fact
 - **The lesson**, the underlying principle, generalized so it applies beyond the one bug
 
-The fifteen specimens cover things like control-flow timing bugs, the difference between `==` and `.equals()` for strings, why `indexOf()` can't find duplicate values, an `else` branch that quietly broke a search loop, and a few classic off-by-one and scope mistakes.
+The fifteen specimens cover things like control-flow timing bugs, the difference between `==` and `.equals()` for strings, why `indexOf()` can't find duplicate values, an `else` branch that quietly broke a search loop, and a couple of classic off-by-one and scope mistakes.
 
 ## View it
 
