@@ -1,4 +1,8 @@
-<h1 style="text-align: center;">Bug Finder Sheet</h1>
+<div align="center">
+
+# Bug Finder Sheet
+
+</div>
 
 <p align="center">
   <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
